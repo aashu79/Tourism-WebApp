@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import expressAsyncHandler from "express-async-handler";
+import asyncErrorHandler from "../middleware/asyncErrorHandler.middleware";
 import User, { UserType } from "../models/user.model";
 
 import { JwtPayload } from "jsonwebtoken";
@@ -18,7 +18,7 @@ import { customRequest } from "../middleware/authenticator.middleware";
 
 //-------------------------Register------------------------------------------------
 
-const register = expressAsyncHandler(async (req: Request, res: Response) => {
+const register = asyncErrorHandler(async (req: Request, res: Response) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     const messages = errors.array().map((err) => err.msg);
@@ -49,32 +49,30 @@ const register = expressAsyncHandler(async (req: Request, res: Response) => {
 });
 
 //--------------------------Get logged in user-----------------------------
-const getUser = expressAsyncHandler(
-  async (req: customRequest, res: Response) => {
-    const id = req.id;
-    if (!id) {
-      throw new Error("Something went wrong");
-    }
-    const user = await User.findById({ _id: id });
-    if (user) {
-      res.status(200).json({
-        success: true,
-        message: "User found",
-        data: {
-          _id: user._id,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          email: user.email,
-          profilePicture: user.profilePicture,
-        },
-      });
-    }
+const getUser = async (req: customRequest, res: Response) => {
+  const id = req.id;
+  if (!id) {
+    throw new Error("Something went wrong");
   }
-);
+  const user = await User.findById({ _id: id });
+  if (user) {
+    res.status(200).json({
+      success: true,
+      message: "User found",
+      data: {
+        _id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        profilePicture: user.profilePicture,
+      },
+    });
+  }
+};
 
 //-------------------Login-----------------------------------
 
-const login = expressAsyncHandler(async (req: Request, res: Response) => {
+const login = asyncErrorHandler(async (req: Request, res: Response) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     const messages = errors.array().map((err) => err.msg);
@@ -117,6 +115,7 @@ const login = expressAsyncHandler(async (req: Request, res: Response) => {
       firstName: user?.firstName,
       lastName: user?.lastName,
       email: user?.email,
+      userType: user?.userType,
       profilePicture: user?.profilePicture,
     },
   });
@@ -124,7 +123,7 @@ const login = expressAsyncHandler(async (req: Request, res: Response) => {
 
 //-----------------------------------activate user-----------------------------------------------
 
-const verifyUser = expressAsyncHandler(async (req: Request, res: Response) => {
+const verifyUser = asyncErrorHandler(async (req: Request, res: Response) => {
   const { token } = req.params;
   if (!token) {
     res
@@ -149,30 +148,28 @@ const verifyUser = expressAsyncHandler(async (req: Request, res: Response) => {
 
 //----------------------------------Refresh Token-----------------------------
 
-const refreshToken = expressAsyncHandler(
-  async (req: Request, res: Response) => {
-    const { token } = req.params;
+const refreshToken = asyncErrorHandler(async (req: Request, res: Response) => {
+  const { token } = req.params;
 
-    if (!token) {
-      res
-        .status(401)
-        .json({ success: false, message: "Invalid or missing token" });
-      return;
-    }
-    const payload = verifyRefreshToken(token as any) as JwtPayload;
-    if (!payload) {
-      res
-        .status(401)
-        .json({ success: false, message: "Invalid or missing token" });
-      return;
-    }
-    const accessToken = generateAccessToken(payload?._id);
-    res.status(200).json({
-      success: true,
-      message: "Token refreshed",
-      AccessToken: accessToken,
-    });
+  if (!token) {
+    res
+      .status(401)
+      .json({ success: false, message: "Invalid or missing token" });
+    return;
   }
-);
+  const payload = verifyRefreshToken(token as any) as JwtPayload;
+  if (!payload) {
+    res
+      .status(401)
+      .json({ success: false, message: "Invalid or missing token" });
+    return;
+  }
+  const accessToken = generateAccessToken(payload?._id);
+  res.status(200).json({
+    success: true,
+    message: "Token refreshed",
+    AccessToken: accessToken,
+  });
+});
 
 export { register, verifyUser, login, getUser, refreshToken };

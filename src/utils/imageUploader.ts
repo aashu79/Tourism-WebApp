@@ -5,7 +5,8 @@ const imageUpload = async (imageFile: Express.Multer.File) => {
       const b64 = Buffer.from(imageFile.buffer).toString("base64");
       const dataUri = `data:${imageFile.mimetype};base64,${b64}`;
       const res = await cloudinary.uploader.upload(dataUri);
-      return res.url;
+      const url = res.url;
+      return url;
     }
   } catch (error) {
     throw error;

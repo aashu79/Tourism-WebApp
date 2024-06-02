@@ -1,27 +1,26 @@
 import mongoose, { InferSchemaType } from "mongoose";
-import Service from "./service.model";
+// import Service from "./service.model";
 
-const getServiceType = async (): Promise<string[]> => {
-  const response = await Service.find();
-  const data = response.map((item, index) => {
-    return item.serviceName;
-  });
-  return data;
-};
+// const getServiceType = async (): Promise<string[]> => {
+//   const response = await Service.find();
+//   const data = response.map((item, index) => {
+//     return item.serviceName;
+//   });
+//   return data;
+// };
 
-const serviceType = getServiceType();
+// const serviceType = getServiceType();
 
 const PacakageScehma = new mongoose.Schema(
   {
     packageName: {
       type: String,
-      required: [true, "Pacakage Name"],
+      required: [true, "Pacakage name is required"],
     },
     serviceType: {
       type: mongoose.Types.ObjectId,
       ref: "Service",
       required: [true, "Service type is required."],
-      enum: serviceType,
     },
     pricePerPerson: {
       type: Number,

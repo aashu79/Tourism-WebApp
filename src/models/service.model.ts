@@ -12,7 +12,6 @@ const ServiceSchema = new mongoose.Schema(
     },
     thumbnail: {
       type: String,
-      required: [true, "Thumbnail is required"],
     },
     createdBy: {
       type: mongoose.Types.ObjectId,

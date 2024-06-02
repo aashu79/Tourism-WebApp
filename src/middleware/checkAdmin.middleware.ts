@@ -16,6 +16,7 @@ const checkAdmin = async (
 
   if (!token) {
     res.status(401).json({ success: false, message: "You are not authorized" });
+    return;
   }
   try {
     const payload = verifyAccessToken(token as string) as JwtPayload;
@@ -24,12 +25,14 @@ const checkAdmin = async (
       res
         .status(401)
         .json({ success: false, message: "You are not authorized" });
+      return;
     }
     const user = await User.findOne({ _id: payload._id });
-    if (user?.userType != "admin") {
+    if (!user || user?.userType != "admin") {
       res
         .status(401)
         .json({ success: false, message: "You are not authorized" });
+      return;
     }
     req.id = user?._id.toString();
     next();

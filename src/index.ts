@@ -27,6 +27,8 @@ app.use(express.urlencoded({ extended: true }));
 
 // Route Import
 import userRoute from "./routes/user.routes";
+import serviceRoute from "./routes/service.routes";
+import pacakageRoute from "./routes/package.routes";
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -39,8 +41,8 @@ app.all("/", (req, res) => {
   res.status(200).json({ message: "Welcome to Hotel Booking API" });
 });
 app.use("/api/v1/auth", userRoute);
-// app.use("/api/v1/hotel", hotelRoutes);
-// app.use("/api/v1/booking",bookingRoutes);
+app.use("/api/v1/service", serviceRoute);
+app.use("/api/v1/pacakage", pacakageRoute);
 
 app.use("*", (req, res) => {
   res.status(404).json({ success: false, message: "Route not found!!!!" });
