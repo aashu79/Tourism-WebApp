@@ -29,6 +29,8 @@ app.use(express.urlencoded({ extended: true }));
 import userRoute from "./routes/user.routes";
 import serviceRoute from "./routes/service.routes";
 import pacakageRoute from "./routes/package.routes";
+import bookingRoute from "./routes/booking.routes";
+import testimonialRoute from "./routes/testimonial.routes";
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -43,6 +45,8 @@ app.all("/", (req, res) => {
 app.use("/api/v1/auth", userRoute);
 app.use("/api/v1/service", serviceRoute);
 app.use("/api/v1/pacakage", pacakageRoute);
+app.use("/api/v1/booking", bookingRoute);
+app.use("/api/v1/testimonial", testimonialRoute);
 
 app.use("*", (req, res) => {
   res.status(404).json({ success: false, message: "Route not found!!!!" });
